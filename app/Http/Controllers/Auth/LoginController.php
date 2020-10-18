@@ -3,38 +3,54 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\User;
+
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
+    public function login() {
+        return "Halaman login";
+    }
 
-    use AuthenticatesUsers;
+    public function post(Request $request) {
+        // $login = [
+        //     'username' => $request->username,
+        //     'password' => $request->password
+        // ];
+        // if(auth()->attempt($login)) {
+        //     $user = User::whereUsername($login['username'])->first();
+            // $allUser = User::where('username', '!=', $login['username'])->get();
+            // return [
+            //     'Akun anda' => 'Berhasil login sebagai '.$user->role,
+            //     'id' => $user->id,
+            //     'username' => $user->username,
+            //     'fullname' => $user->fullname,
+            //     'birth_of_date' => $user->birth_of_date,
+            //     'birth_of_place' => $user->birth_of_place,
+            //     'gender' => $user->gender == 'L' ? 'Laki-laki' : 'Perempuan',
+            //     'role' => $user->role
+            // ];
+            // return User::where('username', '!=', $login['username'])->get();
+            $login = [
+                'username' => $request->username,
+                'password' => $request->password
+            ];
+            if(auth()->attempt($login)) {
+                $data = [
+                    'Akun yang sedang login' => User::whereUsername($login['username'])->first(),
+                    'List users' => User::where('username', '!=', $login['username'])->get()
+                ];
+    
+                return $data;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
+        } else {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'Login Failed'
+            ], 200);
+        }
+        
     }
 }
