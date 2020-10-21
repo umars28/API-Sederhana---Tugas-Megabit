@@ -23,3 +23,7 @@ Route::group(['namespace' => 'Auth'], function () {
     Route::post('login', 'LoginController@post');    
 });
 
+Route::get('post', 'PostController@index');
+Route::post('post', 'PostController@create');
+Route::put('post/{id}','PostController@update');
+Route::delete('post/{id}', 'PostController@delete');
