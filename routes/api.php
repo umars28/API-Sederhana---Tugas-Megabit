@@ -17,13 +17,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::group(['namespace' => 'Auth'], function () {
-    Route::get('register', 'RegisterController@register'); 
-    Route::post('register', 'RegisterController@save');  
-    Route::get('login', 'LoginController@login'); 
-    Route::post('login', 'LoginController@post');    
+    Route::post('register', 'RegisterController@register');
+    Route::post('login', 'LoginController@login');
+    Route::post('logout', 'LoginController@logout')->middleware('auth:api');
 });
 
-Route::get('post', 'PostController@index');
-Route::post('post', 'PostController@create');
-Route::put('post/{id}','PostController@update');
-Route::delete('post/{id}', 'PostController@delete');
+Route::group(['prefix' => 'post', 'middleware' => 'auth:api'], function () {
+    Route::get('/', 'PostController@index');
+    Route::post('/', 'PostController@create');
+    Route::post('/update/{id}','PostController@update');
+    Route::delete('/delete/{id}', 'PostController@delete');
+});

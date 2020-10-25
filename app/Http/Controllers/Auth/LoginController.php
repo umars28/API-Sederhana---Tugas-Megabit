@@ -6,51 +6,39 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\User;
+use Exception;
+use JWTAuth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Facade\FlareClient\Http\Response;
+use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 
 class LoginController extends Controller
 {
-    public function login() {
-        return "Halaman login";
+    public $loginAfterSignUp = true;
+
+    public function login(Request $request) {
+    $input = $request->only('username', 'password');
+    $token = null;
+
+    if (!$token = JWTAuth::attempt($input)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid Email or Password',
+        ], 401);
     }
 
-    public function post(Request $request) {
-        // $login = [
-        //     'username' => $request->username,
-        //     'password' => $request->password
-        // ];
-        // if(auth()->attempt($login)) {
-        //     $user = User::whereUsername($login['username'])->first();
-            // $allUser = User::where('username', '!=', $login['username'])->get();
-            // return [
-            //     'Akun anda' => 'Berhasil login sebagai '.$user->role,
-            //     'id' => $user->id,
-            //     'username' => $user->username,
-            //     'fullname' => $user->fullname,
-            //     'birth_of_date' => $user->birth_of_date,
-            //     'birth_of_place' => $user->birth_of_place,
-            //     'gender' => $user->gender == 'L' ? 'Laki-laki' : 'Perempuan',
-            //     'role' => $user->role
-            // ];
-            // return User::where('username', '!=', $login['username'])->get();
-            $login = [
-                'username' => $request->username,
-                'password' => $request->password
-            ];
-            if(auth()->attempt($login)) {
-                $data = [
-                    'Akun yang sedang login' => User::whereUsername($login['username'])->first(),
-                    'List users' => User::where('username', '!=', $login['username'])->get()
-                ];
-    
-                return $data;
+    return response()->json([
+        'success' => true,
+        'token' => $token,
+    ]);
 
-        } else {
-            return response()->json([
-                'status' => 'Failed',
-                'message' => 'Login Failed'
-            ], 200);
-        }
-        
+    }
+
+    public function logout(Request $request) {
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }
